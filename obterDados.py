@@ -60,7 +60,7 @@ def dictToCsv(item_dic):
 			csv[i].append(float('NaN'))			
 
 	header = ['categoria', 'modelo', 'cilindrada', 'quilometragem', 'ano', 'url', 'preco']
-	pd.DataFrame(csv).to_csv('olx_data2.csv', header=header, index=False)
+	pd.DataFrame(csv).to_csv('olx_data.csv', header=header, index=False)
 
 
 def getInformation():

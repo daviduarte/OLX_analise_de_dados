@@ -20,7 +20,6 @@ def cilindradaXpreco(data, modelo=None):
 	# Substitui as strings vazias por NaN, para que depois possamos eliminá-las
 	data['preco'].replace('', np.nan, inplace=True)
 	data['preco'].replace(' ', np.nan, inplace=True)
-	#print('--'+data['modelo'][0]+'--')
 
 	# Retira motos acima de 1000 cilindradas pois não temos a informação precisa
 	# TODO: Verificar a cilindrada atrvés de outras informações, como título, modelo e descrição do anúncio
@@ -33,12 +32,6 @@ def cilindradaXpreco(data, modelo=None):
 		# Seleciona as motos com o modelo definido por 'modelo'
 		data = data.loc[data['modelo'] == modelo]
 
-	# Tratar outliers
-	# TODO: Implementar um método de detecção de outliers mais eficaz
-	#data = data[data['ano'] < 200000]
-	#data = data[data['ano'] > 0]
-
-	# Plota as 
 	fig, ax = plt.subplots()
 
 	cilindrada = data['cilindrada'].astype('int', copy=True)
@@ -82,10 +75,8 @@ def quilometragemXpreco(data, modelo):
 	# Tratar outliers
 	# TODO: Implementar um método de detecção de outliers mais eficaz
 	data = data[data['quilometragem'] < 200000]
-	data = data[data['quilometragem'] > 0]
+	data = data[data['quilometragem'] > 100]
 
-
-	# Plota as 
 	fig, ax = plt.subplots()
 
 	quilometragem = data['quilometragem'].astype('int', copy=True)
@@ -121,11 +112,6 @@ def anoXpreco(data, modelo):
 
 	# Seleciona as motos com o modelo definido por 'modelo'
 	data = data.loc[data['modelo'] == modelo]
-
-	# Tratar outliers
-	# TODO: Implementar um método de detecção de outliers mais eficaz
-	#data = data[data['ano'] < 200000]
-	#data = data[data['ano'] > 0]
 
 	fig, ax = plt.subplots()
 
@@ -206,7 +192,7 @@ def modeloXpreco(data, numModelos):
 	ax.set_xticklabels(newModelNames[:numModelos])
 	
 	# Salva a Figura
-	fig.savefig('vish.png', bbox_inches='tight')
+	fig.savefig('modeloXpreco.png', bbox_inches='tight')
 
 
 def regressao(data, modelo=None):
@@ -236,6 +222,8 @@ def regressao(data, modelo=None):
 						data['quilometragem'],
 						data['cilindrada_250'],
 						data['cilindrada_300'],
+						data['cilindrada_350'],
+						data['cilindrada_500'],
 						data['ano_2009'],
 						data['ano_2010'],
 						data['ano_2011'],
@@ -279,7 +267,7 @@ def regressao(data, modelo=None):
 
 		y.append(modelo_linear(x, results))
 	
-	print(data_com_urls)
+	#print(data_com_urls)
 	ax.plot(data['quilometragem'], y, 'r--.', label="OLS")
 	#fig.savefig("vish.png")
 	#ax.savefig('vish.png', bbox_inches='tight')
@@ -287,7 +275,7 @@ def regressao(data, modelo=None):
 	# Exibe os resultados ordenados pela coluna "diferenca_de_preco" de ordem crescente.
 	# Os valores menores são os anúncios mais baratos, em relação ao preço predito
 	data_com_urls.sort_values('diferenca_de_preco', ascending=True, inplace=True)
-	data_com_urls.to_csv("vaisefuderporra.txt")
+	data_com_urls.to_csv("diferenca_de_preco.csv")
 
 def modelo_linear(x, results):
 	y = 0
@@ -306,19 +294,14 @@ def analytic():
 	print("Analisando os dados")
 
 	# Carregando os dados
-	data = pd.read_csv('olx_data2.csv')
+	data = pd.read_csv('olx_data.csv')
 	data = data[data.modelo != 'HONDA ']
-	# Retira todos as linhas contendo modelo = 'HONDA'
-
-#	data = data[data.modelo != 'HONDA ']
-#	data = data[data.modelo == 'HONDA CB 300R/ 300R FLEX']
-#	data.sort_values('preco', ascending=False, inplace=True)
 
 	# Vamos gerar os gráficos
 	modeloXpreco(data, 4)
 	anoXpreco(data, 'HONDA CB 300R/ 300R FLEX')
 	quilometragemXpreco(data, 'HONDA CB 300R/ 300R FLEX')
-	cilindradaXpreco(data)
+	cilindradaXpreco(data, 'HONDA CB 300R/ 300R FLEX')
 
 	# Vamos fazer a regressão
 	#regressao(data, modelo='HONDA CB 300R/ 300R FLEX')
